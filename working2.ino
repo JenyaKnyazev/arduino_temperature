@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include "max6675.h"
 #include <LiquidCrystal_I2C.h>
-#include <stdlib.h>
 #include "MatrixKeypad.h"
 #include <stdint.h>
 int soPin = 2;//so serial out
@@ -30,37 +29,39 @@ struct materials{
     int* temperatures;//={270,200,250,230,180};
     int* id_arr;
 };
-materials volatile mat;
+materials mat;
 void init_materials(){
-    mat.names=(char**)malloc(sizeof(char*)*5);
-    mat.temperatures=(int*)malloc(sizeof(int)*5);
+    mat.names=new char *[5];
+    mat.temperatures=new int [5];
     mat.names[0]="PETG";mat.names[1]="HDPE";
     mat.names[2]="PC";mat.names[3]="ABS";
     mat.names[4]="PVC";
     mat.temperatures[0]=270;mat.temperatures[1]=200;
     mat.temperatures[2]=250;mat.temperatures[3]=230;
     mat.temperatures[4]=180;
-    mat.id_arr=(int*)calloc(5,sizeof(int));
+    mat.id_arr=new int[5];
     mat.len=5;
+    for(int i=0;i<5;i++)
+        mat.id_arr[i]=0;
 }
 void add(int t){
     int len=mat.len+1;
     int i;
-    char **n = (char**)malloc(sizeof(char*)*len);
-    int* n2 = (int*)malloc(sizeof(int)*len);
-    int* n3 = (int*)malloc(sizeof(int)*len);
+    char **n = new char *[len];
+    int* n2 = new int[len];
+    int* n3 = new int[len];
     for(i=0;i<len-1;i++){
         n[i]=mat.names[i];
         n2[i]=mat.temperatures[i];
         n3[i]=mat.id_arr[i];
     }
-    n[i]=(char*)malloc(sizeof(char)*16);
+    n[i]=new char[17];
     n2[i]=t;
     n3[i]=++mat.id;
     sprintf(n[i],"TEMP_%d",mat.id);
-    free(mat.names);
-    free(mat.temperatures);
-    free(mat.id_arr);
+    delete []mat.names;
+    delete []mat.temperatures;
+    delete []mat.id_arr;
     mat.names=n;
     mat.temperatures=n2;
     mat.id_arr=n3;
@@ -90,9 +91,9 @@ void del(int id){
     }
     int len=mat.len-1;
     int i,r;
-    char **n = (char**)malloc(sizeof(char*)*len);
-    int* n2 = (int*)malloc(sizeof(int)*len);
-    int* n3 = (int*)malloc(sizeof(int)*len);
+    char **n = new char *[len];
+    int* n2 = new int [len];
+    int* n3 = new int [len];
     for(i=0;i<index;i++){
         n[i]=mat.names[i];
         n2[i]=mat.temperatures[i];
@@ -103,9 +104,9 @@ void del(int id){
         n2[i]=mat.temperatures[r];
         n3[i]=mat.id_arr[r];
     }
-    free(mat.names);
-    free(mat.temperatures);
-    free(mat.id_arr);
+    delete []mat.names;
+    delete []mat.temperatures;
+    delete []mat.id_arr;
     mat.names=n;
     mat.temperatures=n2;
     mat.id_arr=n3;
